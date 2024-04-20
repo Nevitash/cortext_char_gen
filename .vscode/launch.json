@@ -1,0 +1,47 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'cortext_char_gen'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=cortext_char_gen",
+                    "--package=cortext_char_gen"
+                ],
+                "filter": {
+                    "name": "cortext_char_gen",
+                    "kind": "bin"
+                },
+                "preLaunchTask": "build"
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'cortext_char_gen'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=cortext_char_gen",
+                    "--package=cortext_char_gen"
+                ],
+                "filter": {
+                    "name": "cortext_char_gen",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build"
+        }
+    ]
+}
