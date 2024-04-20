@@ -1,7 +1,7 @@
 use derive_builder::Builder;
 use rand::Rng;
 
-#[derive(Debug, Builder)]
+#[derive(Debug, Builder, Clone)]
 pub struct Die {
     sides: i32,
     effect_die: bool,
