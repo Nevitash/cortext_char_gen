@@ -1,12 +1,20 @@
+use db::db::{connect, get_connection_string};
 use logs::info;
+use mongodb::bson::doc;
 
 mod r#trait;
 mod die;
 mod sfx;
 mod disctinction;
+mod db;
 #[tokio::main]
 async fn main() {
     init_logging().await;
+    let connection_string = get_connection_string();
+    let db_client = connect(&connection_string).await.expect(format!("Could not connect via {}", connection_string).as_str());
+    db_client.database("admin").run_command(doc! { "ping": 1 }, None).await.expect("Ping failed");
+    println!("Pinged your deployment. You successfully connected to MongoDB!");
+
 }
 
 async fn init_logging() {
