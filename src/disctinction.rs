@@ -1,7 +1,7 @@
-use derive_builder::Builder;
+use serde::{Deserialize, Serialize};
 
 use crate::{sfx::SFX, r#trait::Trait};
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Distinction{
     name: String,
     description: String,

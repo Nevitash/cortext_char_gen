@@ -12,3 +12,6 @@ serde = { version = "1.0.198", features = ["derive"] }
 mongodb = "2.8.2"
 derive_builder = "0.20.0"
 rand = "0.8.5"
+logs = "0.7.1"
+log4rs = "1.3.0"
+typetag = "0.2.16"

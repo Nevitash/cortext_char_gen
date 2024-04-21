@@ -1,7 +1,8 @@
 use derive_builder::Builder;
 use rand::Rng;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Builder, Clone)]
+#[derive(Debug, Builder, Clone, Serialize, Deserialize)]
 pub struct Die {
     sides: i32,
     effect_die: bool,
