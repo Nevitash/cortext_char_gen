@@ -3,13 +3,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::{die::Die, sfx::SFX};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TraitSet{
     name: String,
     traits: Vec<Trait>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Trait{
     die: Die,
     name: String,

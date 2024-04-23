@@ -14,7 +14,7 @@ async fn main() {
     let db_client = connect(&connection_string).await.expect(format!("Could not connect via {}", connection_string).as_str());
     db_client.database("admin").run_command(doc! { "ping": 1 }, None).await.expect("Ping failed");
     println!("Pinged your deployment. You successfully connected to MongoDB!");
-
+    db::db::init(db_client).await;
 }
 
 async fn init_logging() {
