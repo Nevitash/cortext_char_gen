@@ -11,7 +11,6 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"SonarSource.sonarlint-vscode",
 				"mohsen1.prettify-json"
 			]
 		}

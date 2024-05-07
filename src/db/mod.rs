@@ -14,6 +14,8 @@ pub mod collections {
     pub const GAME: &str = "game";
 }
 
+pub mod user;
+
 pub const DB: &str = "chargen";
 
 pub async fn connect(uri: &String) -> Result<Client> {
@@ -33,13 +35,29 @@ pub async fn init(client: Client) -> Result<()> {
     Ok(())
 }
 
+pub enum DataError {
+    NameMustBeUnique(String),
+    EmailMustBeUnique(String),
+    ConnectionError(),
+    Unmapped(mongodb::error::Error)
+}
+
+impl From<mongodb::error::Error> for DataError {
+    fn from(error: mongodb::error::Error) -> Self {
+        match error.kind {
+            _ => DataError::Unmapped(error)
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     #[serde(rename = "_id")]
-    id: Uuid,
-    name: String,
-    email: String,
-    salt: Uuid,
+    pub id: Uuid,
+    pub name: String,
+    pub email: String,
+    pub password_hash: String,
+    pub salt: Vec<u8>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -48,7 +66,6 @@ pub struct Character {
     id: Uuid,
     user_id: Uuid,
     name: String,
-    main_trait: String,
     distinctions: Vec<Distinction>,
     trait_sets: Vec<TraitSet>,
     assets: Vec<String>,
@@ -167,7 +184,7 @@ pub async fn init_user(client: &Client) -> mongodb::error::Result<()> {
     let validator = doc! {
         "$jsonSchema": {
             "bsonType": "object",
-            "required": ["name", "email", "salt"],
+            "required": ["name", "email", "salt", "password_hash"],
             "properties": {
                 "name": {
                     "bsonType": "string",
@@ -179,7 +196,11 @@ pub async fn init_user(client: &Client) -> mongodb::error::Result<()> {
                 },
                 "salt": {
                     "bsonType": "binData",
-                    "description": "must be a uuid and is required"
+                    "description": "must be a binary data and is required"
+                },
+                "password_hash": {
+                    "bsonType": "string",
+                    "description": "must be a string and is required"
                 }
             }
         }
@@ -215,7 +236,17 @@ pub async fn init_user(client: &Client) -> mongodb::error::Result<()> {
         .create_index(
             IndexModel::builder()
                 .keys(doc! {"email": 1, "salt": 1})
-                .options(non_unique_options)
+                .options(non_unique_options.clone())
+                .build(),
+            None,
+        )
+        .await?;
+
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(doc! {"email": 1, "password_hash": 1})
+                .options(non_unique_options.clone())
                 .build(),
             None,
         )
@@ -226,9 +257,9 @@ pub async fn init_user(client: &Client) -> mongodb::error::Result<()> {
 
 #[cfg(test)]
 mod tests {
+    use crate::db::{connect, get_connection_string, DB};
     use mongodb::bson::doc;
     use mongodb::error::Result;
-    use crate::db::{connect, get_connection_string, DB};
 
     #[tokio::test]
     async fn db_connection_test() -> Result<()> {
@@ -240,7 +271,7 @@ mod tests {
             .database(DB)
             .run_command(doc! { "ping": 1 }, None)
             .await?;
-        
+
         Ok(())
     }
 }
